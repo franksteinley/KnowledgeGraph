@@ -1,0 +1,41 @@
+cd /d E:\konwbig\neo4j-community-5.26.4
+
+bin\neo4j-admin database import full --verbose --overwrite-destination ^
+--nodes=AdaptiveRepresentation=import/AdaptiveRepresentation.csv ^
+--nodes=ArtificialIntelligence=import/ArtificialIntelligence.csv ^
+--nodes=Attention=import/Attention.csv ^
+--nodes=Cognition=import/Cognition.csv ^
+--nodes=CognitiveArchitecture=import/CognitiveArchitecture.csv ^
+--nodes=CognitiveComputing=import/CognitiveComputing.csv ^
+--nodes=CognitiveControl=import/CognitiveControl.csv ^
+--nodes=CognitiveLinguistics=import/CognitiveLinguistics.csv ^
+--nodes=CognitiveNeuroscience=import/CognitiveNeuroscience.csv ^
+--nodes=CognitivePsychology=import/CognitivePsychology.csv ^
+--nodes=CognitiveReasoningFramework=import/CognitiveReasoningFramework.csv ^
+--nodes=ConnectionistModel=import/ConnectionistModel.csv ^
+--nodes=Consciousness=import/Consciousness.csv ^
+--nodes=DeepLearning=import/DeepLearning.csv ^
+--nodes=EEG=import/EEG.csv ^
+--nodes=ERP=import/ERP.csv ^
+--nodes=EventGraph=import/EventGraph.csv ^
+--nodes=ExecutiveFunction=import/ExecutiveFunction.csv ^
+--nodes=EyeTracking=import/EyeTracking.csv ^
+--nodes=Figure=import/Figure.csv ^
+--nodes=fMRI=import/fMRI.csv ^
+--nodes=fNIRS=import/fNIRS.csv ^
+--nodes=Intelligence=import/Intelligence.csv ^
+--nodes=Knowledge=import/Knowledge.csv ^
+--nodes=KnowledgeGraph=import/KnowledgeGraph.csv ^
+--nodes=Language=import/Language.csv ^
+--nodes=Learning=import/Learning.csv ^
+--nodes=MEG=import/MEG.csv ^
+--nodes=Memory=import/Memory.csv ^
+--nodes=Neurolinguistics=import/Neurolinguistics.csv ^
+--nodes=Perception=import/Perception.csv ^
+--nodes=PET=import/PET.csv ^
+--nodes=Psycholinguistics=import/Psycholinguistics.csv ^
+--nodes=Sociolinguistics=import/Sociolinguistics.csv ^
+--nodes=SymbolicProcessingModel=import/SymbolicProcessingModel.csv ^
+--nodes=Thinking=import/Thinking.csv ^
+--nodes=Time=import/Time.csv ^
+--relationships=RELATION=import/relations.csv
