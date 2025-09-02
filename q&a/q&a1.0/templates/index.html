@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>知识图谱问答系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>知识图谱问答系统</h1>
+        <div class="input-group">
+            <input type="text" id="question" placeholder="请输入您的问题...">
+            <button onclick="askQuestion()">提问</button>
+        </div>
+        <div class="response-box">
+            <h3>系统回答:</h3>
+            <div id="answer"></div>
+        </div>
+    </div>
+
+    <script>
+        async function askQuestion() {
+            const question = document.getElementById('question').value;
+            const answerDiv = document.getElementById('answer');
+            answerDiv.innerHTML = "思考中...";
+            
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+                const data = await response.json();
+                
+                if (data.error) {
+                    answerDiv.innerHTML = `<span class="error">${data.error}</span>`;
+                } else {
+                    // 格式化答案显示
+                    let resultHtml = '';
+                    if (Array.isArray(data.result)) {
+                        resultHtml = data.result.map(item => 
+                            `<div class="result-item">${JSON.stringify(item)}</div>`
+                        ).join('');
+                    } else {
+                        resultHtml = `<div class="result-item">${data.result}</div>`;
+                    }
+                    answerDiv.innerHTML = resultHtml;
+                }
+            } catch (err) {
+                answerDiv.innerHTML = `<span class="error">网络错误: ${err.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

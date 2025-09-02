@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识图谱问答系统</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --error: #ef4444;
+            --error-light: #fee2e2;
+            --highlight: #f1f5f9;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-top: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .logo-icon i {
+            font-size: 28px;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 24px;
+            font-weight: 400;
+        }
+        
+        .input-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .input-group {
+            display: flex;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        #question {
+            flex-grow: 1;
+            padding: 18px 24px;
+            border: none;
+            font-size: 1.1rem;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        
+        #question:focus {
+            outline: none;
+            background: var(--card-bg);
+            box-shadow: inset 0 0 0 2px var(--primary-light);
+        }
+        
+        #question::placeholder {
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background: var(--primary-dark);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .example-chip {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .example-chip:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .response-time {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .badge {
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .badge-original {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .badge-llm {
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+        }
+        
+        .results-container {
+            display: flex;
+            gap: 24px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .method-box {
+            flex: 1 1 45%;
+            min-width: 300px;
+            padding: 24px;
+            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .method-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .method-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .method-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cypher-box {
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            border-left: 4px solid #0ea5e9;
+            color: #334155;
+            line-height: 1.5;
+        }
+        
+        .result-content {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+        
+        .answer-box {
+            background: var(--success-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid var(--success);
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .answer-list {
+            background: var(--success-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid var(--success);
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .answer-list ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        
+        .answer-list li {
+            margin-bottom: 10px;
+            padding-left: 10px;
+            position: relative;
+        }
+        
+        .answer-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .answer-list li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--text-secondary);
+            padding: 30px;
+            flex-direction: column;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(37, 99, 235, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: var(--error-light);
+            padding: 18px;
+            border-radius: 8px;
+            color: var(--error);
+            border-left: 4px solid var(--error);
+            font-weight: 500;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding: 30px 20px 20px;
+        }
+        
+        .system-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        @media (max-width: 768px) {
+            .results-container {
+                flex-direction: column;
+            }
+            
+            .method-box {
+                flex: 1 1 100%;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            #question {
+                padding: 16px;
+            }
+            
+            button {
+                padding: 16px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+        
+        .info-text h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        
+        .info-text p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #bfdbfe 0%, #bfdbfe 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 2px;
+        }
+        
+        .result-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: #e9f7ff;
+            border-radius: 4px;
+        }
+        
+        .result-content {
+            white-space: pre-wrap;
+        }
+        
+        .object-result {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #e2e8f0;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .object-key {
+            font-weight: bold;
+            color: #1d4ed8;
+        }
+        
+        .object-value {
+            color: #334155;
+        }
+        
+        .object-row {
+            display: flex;
+            padding: 5px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .object-row:last-child {
+            border-bottom: none;
+        }
+        
+        .result-count {
+            background: var(--primary-light);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div>
+                    <h1>知识图谱问答系统</h1>
+                    <p class="subtitle">结合<span class="highlight">规则引擎</span>与<span class="highlight">大语言模型</span>技术，提供精准的知识图谱问答服务</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="input-container">
+            <div class="input-group">
+                <input type="text" id="question" placeholder="请输入您的问题，例如：比尔盖茨的母亲是谁？">
+                <button onclick="askQuestion()">
+                    <i class="fas fa-paper-plane"></i> 提问
+                </button>
+            </div>
+            
+            <div class="examples">
+                <div class="example-chip" onclick="setExample('比尔盖茨的母亲是谁？')">比尔盖茨的母亲是谁？</div>
+                <div class="example-chip" onclick="setExample('特斯拉的创始人有哪些成就？')">特斯拉的创始人有哪些成就？</div>
+                <div class="example-chip" onclick="setExample('苹果公司的主要产品有哪些？')">苹果公司的主要产品有哪些？</div>
+                <div class="example-chip" onclick="setExample('爱因斯坦在哪个大学工作过？')">爱因斯坦在哪个大学工作过？</div>
+            </div>
+        </div>
+        
+        <div class="response-time" id="response-time">
+            <i class="fas fa-clock"></i>
+            <span id="time-text">等待提问...</span>
+        </div>
+        
+        <div class="results-container">
+            <div class="method-box">
+                <div class="method-header">
+                    <h3><i class="fas fa-cogs"></i> 规则引擎处理</h3>
+                    <span class="badge badge-original"><i class="fas fa-code"></i> 传统方法</span>
+                </div>
+                <div id="original-result">
+                    <div class="result-content" id="original-answer">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <div>等待问题输入...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="method-box">
+                <div class="method-header">
+                    <h3><i class="fas fa-robot"></i> 大模型处理</h3>
+                    <span class="badge badge-llm"><i class="fas fa-microchip"></i> AI技术</span>
+                </div>
+                <div id="llm-result">
+                    <div class="result-content" id="llm-answer">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <div>等待问题输入...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="system-info">
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="info-text">
+                    <h4>知识图谱</h4>
+                    <p>包含3000+实体关系</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="info-text">
+                    <h4>响应速度</h4>
+                    <p>平均处理时间 &lt; 1.5秒</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="info-text">
+                    <h4>精准可靠</h4>
+                    <p>双重验证确保准确性</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>知识图谱问答系统 © 2025 | 结合规则引擎与AI技术 | 版本 2.1.0</p>
+        </footer>
+    </div>
+
+    <script>
+        // 设置示例问题
+        function setExample(question) {
+            document.getElementById('question').value = question;
+        }
+        
+        // 提问函数
+        async function askQuestion() {
+            const question = document.getElementById('question').value.trim();
+            const originalAnswerDiv = document.getElementById('original-answer');
+            const llmAnswerDiv = document.getElementById('llm-answer');
+            const timeText = document.getElementById('time-text');
+            const timeContainer = document.getElementById('response-time');
+            
+            if (!question) {
+                originalAnswerDiv.innerHTML = '<div class="error">请输入有效的问题</div>';
+                llmAnswerDiv.innerHTML = '<div class="error">请输入有效的问题</div>';
+                return;
+            }
+            
+            // 显示加载状态
+            originalAnswerDiv.innerHTML = '<div class="loading"><div class="loading-spinner"></div>正在通过规则引擎分析问题...</div>';
+            llmAnswerDiv.innerHTML = '<div class="loading"><div class="loading-spinner"></div>大语言模型思考中...</div>';
+            timeText.textContent = "处理中...";
+            timeContainer.style.color = "var(--warning)";
+            
+            try {
+                // 记录开始时间
+                const startTime = new Date();
+                
+                // 发送请求到后端API
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`请求失败: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // 计算处理时间
+                const endTime = new Date();
+                const actualTime = endTime - startTime;
+                const processingTime = (actualTime / 1000).toFixed(2) + "秒";
+                
+                // 显示处理时间
+                timeText.textContent = `处理时间: ${processingTime}`;
+                timeContainer.style.color = "var(--text-secondary)";
+                
+                // 显示原有规则结果
+                displayResult(originalAnswerDiv, data.original);
+                
+                // 显示大模型结果
+                displayResult(llmAnswerDiv, data.llm);
+                
+            } catch (err) {
+                console.error('请求错误:', err);
+                originalAnswerDiv.innerHTML = `<div class="error">请求错误: ${err.message || '请检查网络连接'}</div>`;
+                llmAnswerDiv.innerHTML = `<div class="error">请求错误: ${err.message || '请检查网络连接'}</div>`;
+                timeText.textContent = "处理失败";
+                timeContainer.style.color = "var(--error)";
+            }
+        }
+        
+        // 显示结果 - 支持多值显示和对象处理
+        function displayResult(div, resultData) {
+            let content = '';
+            
+            if (resultData.error) {
+                content = `<div class="error">${resultData.error}</div>`;
+            } else {
+                if (resultData.cypher) {
+                    content += `<div class="cypher-box">${resultData.cypher}</div>`;
+                }
+                
+                if (resultData.answer) {
+                    // 检查返回的是数组还是字符串或对象
+                    if (Array.isArray(resultData.answer)) {
+                        // 处理数组类型结果
+                        content += '<div class="answer-list">';
+                        content += '<span class="result-count">找到 ' + resultData.answer.length + ' 个结果</span>';
+                        content += '<ul>';
+                        
+                        resultData.answer.forEach(item => {
+                            // 检查数组元素类型
+                            if (typeof item === 'string' || typeof item === 'number') {
+                                content += `<li>${item}</li>`;
+                            } else if (typeof item === 'object') {
+                                // 处理对象类型
+                                content += '<li><div class="object-result">';
+                                for (const key in item) {
+                                    if (item.hasOwnProperty(key)) {
+                                        const value = item[key];
+                                        content += `<div class="object-row">`;
+                                        content += `<span class="object-key">${key}:</span> `;
+                                        
+                                        // 检查值类型
+                                        if (typeof value === 'object') {
+                                            content += `<span class="object-value">${JSON.stringify(value, null, 2)}</span>`;
+                                        } else {
+                                            content += `<span class="object-value">${value}</span>`;
+                                        }
+                                        
+                                        content += `</div>`;
+                                    }
+                                }
+                                content += '</div></li>';
+                            } else {
+                                content += `<li>${item}</li>`;
+                            }
+                        });
+                        
+                        content += '</ul>';
+                        content += '</div>';
+                    } else if (typeof resultData.answer === 'object') {
+                        // 处理单个对象
+                        content += '<div class="answer-list">';
+                        content += '<p>找到以下结果：</p>';
+                        content += '<div class="object-result">';
+                        for (const key in resultData.answer) {
+                            if (resultData.answer.hasOwnProperty(key)) {
+                                const value = resultData.answer[key];
+                                content += `<div class="object-row">`;
+                                content += `<span class="object-key">${key}:</span> `;
+                                
+                                // 检查值类型
+                                if (typeof value === 'object') {
+                                    content += `<span class="object-value">${JSON.stringify(value, null, 2)}</span>`;
+                                } else {
+                                    content += `<span class="object-value">${value}</span>`;
+                                }
+                                
+                                content += `</div>`;
+                            }
+                        }
+                        content += '</div>';
+                        content += '</div>';
+                    } else {
+                        // 处理字符串类型结果
+                        content += `<div class="answer-box">${resultData.answer}</div>`;
+                    }
+                } else {
+                    content += '<div class="result-content">没有找到相关答案</div>';
+                }
+            }
+            
+            div.innerHTML = content || '<div class="result-content">没有返回结果</div>';
+        }
+        
+        // 初始化页面时添加回车键提交功能
+        window.onload = function() {
+            document.getElementById('question').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    askQuestion();
+                }
+            });
+        }
+        
+        // 模拟数据展示 - 仅用于演示
+        function showDemoData() {
+            const originalAnswerDiv = document.getElementById('original-answer');
+            const llmAnswerDiv = document.getElementById('llm-answer');
+            
+            // 模拟规则引擎返回对象数组
+            const originalData = {
+                cypher: "MATCH (n {name: '认知科学'}) RETURN n AS result",
+                answer: [
+                    {
+                        name: "认知科学",
+                        type: "学科",
+                        description: "研究人类认知过程的跨学科领域",
+                        yearEstablished: 1970
+                    },
+                    {
+                        name: "人工智能",
+                        type: "相关领域",
+                        description: "模拟人类智能的计算机系统",
+                        relation: "应用领域"
+                    }
+                ]
+            };
+            
+            // 模拟大模型返回字符串
+            const llmData = {
+                answer: "认知科学是一门研究人类认知过程的跨学科领域，涉及心理学、神经科学、语言学、哲学、人类学和计算机科学等多个学科。它主要研究人类如何获取、存储、处理和利用信息。"
+            };
+            
+            displayResult(originalAnswerDiv, originalData);
+            displayResult(llmAnswerDiv, llmData);
+        }
+        
+        // 页面加载后显示演示数据
+        setTimeout(showDemoData, 2000);
+    </script>
+</body>
+</html>
